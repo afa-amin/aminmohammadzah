@@ -4,361 +4,932 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>رزومه محمدامین محمدزاده</title>
-    <meta name="description" content="رزومه حرفه‌ای محمدامین محمدزاده، برنامه‌نویس فرانت‌اند و طراح وب خلاق">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Vazir:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="description" content="رزومه حرفه‌ای محمدامین محمدزاده، برنامه‌نویس فرانت‌اند، طراح وب و متخصص پردازش تصویر">
+    <meta name="keywords" content="برنامه‌نویس وب، فرانت‌اند، طراح وب، پردازش تصویر، محمدامین محمدزاده">
+    <meta name="author" content="Mohammadamin Mohammadzadeh">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Vazir:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <style>
         :root {
-            --primary-color: #2563eb;
+            --primary-color: #3b82f6;
+            --secondary-color: #10b981;
             --background-color: #f3f4f6;
-            --text-color: #1f2937;
+            --text-color: #111827;
             --card-bg: #ffffff;
-            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --hover-scale: 1.05;
         }
         [data-theme="dark"] {
             --primary-color: #60a5fa;
-            --background-color: #1f2937;
-            --text-color: #e5e7eb;
-            --card-bg: #374151;
-            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            --secondary-color: #34d399;
+            --background-color: #111827;
+            --text-color: #ffffff;
+            --card-bg: #1f2937;
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
         body {
             font-family: 'Vazir', 'Inter', sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
             transition: all 0.3s ease;
+            overflow-x: hidden;
         }
         .rtl { direction: rtl; }
         .ltr { direction: ltr; }
-        .skill-circle {
-            stroke: var(--primary-color);
-            stroke-width: 5;
-            fill: none;
-            stroke-dasharray: 251;
-            stroke-dashoffset: 251;
+        .skill-progress {
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .skill-progress-bar {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            height: 100%;
+            width: 0;
+            transition: width 1s ease;
         }
         .certificate-card:hover .certificate-overlay {
             opacity: 1;
+            transform: rotateY(0deg);
+        }
+        .certificate-card {
+            perspective: 1000px;
+        }
+        .certificate-overlay {
+            transform: rotateY(90deg);
+            transition: all 0.5s ease;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+        .icon-svg:hover {
+            transform: scale(var(--hover-scale));
+            filter: drop-shadow(0 0 12px var(--primary-color));
+        }
+        header {
+            backdrop-filter: blur(12px);
+            background-color: rgba(255, 255, 255, 0.85);
+        }
+        [data-theme="dark"] header {
+            background-color: rgba(31, 41, 55, 0.85);
+        }
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .input-focus {
+            transition: all 0.3s ease;
+        }
+        .input-focus:focus {
+            transform: scale(1.02);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px var(--primary-color);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+        }
+        .canvas-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        h1, h2, h3, p {
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        [data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3, [data-theme="dark"] p {
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
     </style>
 </head>
 <body class="min-h-screen">
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <svg class="w-20 h-20" viewBox="0 0 100 100" fill="none" stroke="var(--primary-color)" stroke-width="6">
+            <path id="loader-path" d="M20 50c0 16.57 13.43 30 30 30s30-13.43 30-30-13.43-30-30-30-30 13.43-30 30" />
+        </svg>
+    </div>
+
     <!-- Header -->
-    <header class="sticky top-0 bg-[var(--card-bg)] shadow-[var(--card-shadow)] z-10">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="text-2xl font-bold text-[var(--primary-color)]">
-                <!-- Placeholder for Logo -->
-                <img src="/path-to-your-logo.svg" alt="Logo" class="h-10" id="logo">
+    <header class="sticky top-0 bg-[var(--card-bg)] shadow-[var(--card-shadow)] z-10" role="banner">
+        <div class="container mx-auto px-4 sm:px-6 md:px-8 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-[var(--primary-color)] flex items-center">
+                <svg id="logo" class="w-10 h-10 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+                <span data-i18n="hero.name">محمدامین محمدزاده</span>
             </div>
-            <nav class="flex space-x-4 space-x-reverse items-center">
-                <a href="#about" class="text-[var(--text-color)] hover:text-[var(--primary-color)]" data-i18n="nav.about">درباره من</a>
-                <a href="#skills" class="text-[var(--text-color)] hover:text-[var(--primary-color)]" data-i18n="nav.skills">مهارت‌ها</a>
-                <a href="#education" class="text-[var(--text-color)] hover:text-[var(--primary-color)]" data-i18n="nav.education">تحصیلات</a>
-                <a href="#experience" class="text-[var(--text-color)] hover:text-[var(--primary-color)]" data-i18n="nav.experience">سوابق شغلی</a>
-                <a href="#certificates" class="text-[var(--text-color)] hover:text-[var(--primary-color)]" data-i18n="nav.certificates">گواهینامه‌ها</a>
-                <a href="#contact" class="text-[var(--text-color)] hover:text-[var(--primary-color)]" data-i18n="nav.contact">تماس با من</a>
-                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 2a8 8 0 100 16 8 8 0 000-16zm0 12a1 1 0 110-2 1 1 0 010 2zm0-8a1 1 0 110-2 1 1 0 010 2z" /></svg>
+            <nav class="flex space-x-4 space-x-reverse items-center" role="navigation">
+                <a href="#about" class="text-[var(--text-color)] hover:text-[var(--primary-color)] transition-transform duration-300 hover:scale-[var(--hover-scale)] text-sm sm:text-base" data-i18n="nav.about">درباره من</a>
+                <a href="#skills" class="text-[var(--text-color)] hover:text-[var(--primary-color)] transition-transform duration-300 hover:scale-[var(--hover-scale)] text-sm sm:text-base" data-i18n="nav.skills">مهارت‌ها</a>
+                <a href="#education" class="text-[var(--text-color)] hover:text-[var(--primary-color)] transition-transform duration-300 hover:scale-[var(--hover-scale)] text-sm sm:text-base" data-i18n="nav.education">تحصیلات</a>
+                <a href="#experience" class="text-[var(--text-color)] hover:text-[var(--primary-color)] transition-transform duration-300 hover:scale-[var(--hover-scale)] text-sm sm:text-base" data-i18n="experience.title">سوابق</a>
+                <a href="#projects" class="text-[var(--text-color)] hover:text-[var(--primary-color)] transition-transform-all duration-300 hover:scale-[var(--hover-scale)] text-sm sm:text-base" data-i18n="nav.projects">Projects</a>
+                <a href="#certificates" class="text-[var(--text-color)] hover:text-[var(--primary-color)] transition-transform duration-300 hover:scale-[var(--hover-scale)] text-sm sm:text-base" data-i18nnav.certificates">گواهینامه‌ها</a>
+                <a href="#management" class="text-[var(--text-color)] hover:text-[var(--primary-color)] transition-transform duration-300 hover:scale-[var(--hover-scale)] text-sm sm:text-base" data-i18nnav.management>مهارت‌های مدیریتی</a>
+                <a href="#contact" class="text-[var(--text-color)] hover:text-[var(--primary-color)] transition-transform duration-300 hover:scale-[var(--hover-scale)] text-sm sm:text-base" data-i18n="nav.contact">تماس</a>
+                <button type="button" id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" aria-label="Toggle Theme">
+                    <svg class="w-6 h-6 icon-svg" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 2a8 8 0 100 16 8 8 0 000-16zm0 12a1 1 0 010-2 1 1 0 010 2zm0-8a1 1 0 010-2z1 1 0 010 2z" />
+                    </svg>
                 </button>
-                <button id="lang-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20zm-2 14v-2h4v2h-4zm4-4v-2h-4v2h4zm-4-4V6h4v2h-4z" /></svg>
+                <button type="button" id="lang-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" aria-label="Toggle Language">
+                    <svg class="w-6 h-6 icon-svg" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2a10 10 0 110 20 10 10 0 010-20zm-2 14v-2h4v2h-4zm4-4v-2h-4v2h4zm-4-4V6h4v2h-4z" />
+                    </svg>
                 </button>
             </nav>
         </div>
     </header>
 
     <!-- Hero Section -->
-    <section id="about" class="py-20 container mx-auto px-4 text-center">
-        <div class="relative">
-            <h1 class="text-4xl md:text-5xl font-bold text-[var(--text-color)]" data-i18n="hero.name">محمدامین محمدزاده</h1>
-            <p class="mt-4 text-lg text-gray-600 dark:text-gray-300" data-i18n="hero.tagline">برنامه‌نویس فرانت‌اند و طراح وب خلاق</p>
-            <p class="mt-2 text-gray-500 dark:text-gray-400" data-i18n="hero.location">همدان، ایران</p>
-            <a href="/resume.pdf" download class="mt-6 inline-block bg-[var(--primary-color)] text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-700" data-i18n="hero.download">دانلود رزومه</a>
-            <svg class="absolute -bottom-10 left-1/2 transform -translate-x-1/2 w-16 h-16 text-[var(--primary-color)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 5v14m7-7H5" />
-            </svg>
+    <section id="about" class="relative py-16 sm:py-24 container mx-auto px-4 sm:px-6 md:px-8 text-center overflow-hidden" role="region" aria-labelledby="about-title">
+        <canvas id="particle-canvas" class="canvas-particles"></canvas>
+        <div class="relative z-10">
+            <h1 id="about-title" class="text-3xl sm:text-4xl md:text-5xl font-semibold" data-i18n="hero.name">محمدامین محمدزاده</h1>
+            <p class="mt-4 text-sm sm:text-base md:text-lg type-animation" data-i18n="hero.tagline">برنامه‌نویس فرانت‌اند، طراح وب و متخصص پردازش تصویر</p>
+            <p class="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-100" data-i18n="hero.location">همدان، ایران</p>
+            <p class="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-100" data-i18n="hero.email">m.amin.mdzh@gmail.com</p>
+            <a href="/resume.pdf" download class="mt-6 inline-block bg-[var(--primary-color)] text-white px-6 py-3 rounded-full text-sm sm:text-base font-medium hover:bg-[var(--secondary-color)] transition-all duration-300 transform hover:scale-[var(--hover-scale)]" data-i18n="hero.download">دانلود رزومه</a>
         </div>
+        <svg class="absolute inset-0 w-full h-16 bottom-0 opacity-20 z-0" viewBox="0 0 200 50" fill="none" stroke="var(--primary-color)" stroke-width="1">
+            <path d="M0 25h50c25 0 25 25 50 25s25-25 50 25h50" />
+        </svg>
     </section>
 
     <!-- Skills Section -->
-    <section id="skills" class="py-20 bg-[var(--background-color)]">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center text-[var(--text-color)] mb-10" data-i18n="skills.title">مهارت‌ها</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-[var(--card-bg)] p-6 rounded-lg shadow-[var(--card-shadow)] text-center">
-                    <h3 class="text-xl font-semibold text-[var(--text-color)] mb-4" data-i18n="skills.programming">زبان‌های برنامه‌نویسی</h3>
-                    <div class="flex flex-wrap justify-center gap-2">
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">JavaScript</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">HTML</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">CSS</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Python</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">C++</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Rust</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Assembly</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Ruby</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">C</span>
+    <section id="skills" class="py-16 sm:py-24 bg-[var(--background-color)]" role="region" aria-labelledby="skills-title">
+        <div class="container mx-auto px-4 sm:px-6 md:px-8">
+            <h2 id="skills-title" class="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-10 sm:mb-12" data-i18n="skills.title">مهارت‌ها</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+                <div class="bg-[var(--card-bg)] p-4 sm:p-6 rounded-lg shadow-[var(--card-shadow)] transform transition-all duration-500 hover:scale-[var(--hover-scale)]">
+                    <h3 class="text-lg sm:text-xl font-semibold text-center mb-4" data-i18n="skills.programming">زبان‌های برنامه‌نویسی</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">JavaScript (70%)</span>
+                            <div class="skill-progress ml-4 w-full">
+                                <div class="skill-progress-bar" style="width: 70%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">HTML</span>
+                            <div class="skill-progress ml-4 w-full">
+                                <div class="skill-progress-bar" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">CSS</span>
+                            <div class="skill-progress ml-4 w-full">
+                                <div class="skill-progress-bar" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Python</span>
+                            <div class="skill-progress ml-4 w-full">
+                                <div class="skill-progress-bar" style="width: 80%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">C++</span>
+                            <div class="skill-progress ml-4 w-full">
+                                <div class="skill-progress-bar" style="width: 60%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Rust</span>
+                            <div class="skill-progress ml-4 w-full">
+                                <div class="skill-progress-bar" style="width: 50%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Assembly</span>
+                            <div class="skill-progress ml-4 w-full">
+                                <div class="skill-progress-bar" style="width: 50%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Ruby</span>
+                            <div class="skill-progress ml-4 w-full">
+                                <div class="skill-progress-bar" style="width: 50%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">C</span>
+                            <div class="skill-progress ml-4 w-full">
+                                <div class="skill-progress-bar" style="width: 65%"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="bg-[var(--card-bg)] p-6 rounded-lg shadow-[var(--card-shadow)] text-center">
-                    <h3 class="text-xl font-semibold text-[var(--text-color)] mb-4" data-i18n="skills.frameworks">فریم‌ورک‌ها</h3>
-                    <div class="flex flex-wrap justify-center gap-2">
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">React</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Angular</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Vue</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Svelte</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Astro</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Next.js</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Nuxt</span>
+                <div class="bg-[var(--card-bg)] p-4 sm:p-6 rounded-lg shadow-[var(--card-shadow)] transform transition-all duration-500 hover:scale-[var(--hover-scale)]">
+                    <h3 class="text-lg sm:text-xl font-semibold text-center mb-4" data-i18n="skills.frameworks">فریم‌ورک‌ها</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z"></svg>
+                            <span class="text-sm sm:text-base">React</span>
+                            <div class="skill-progress ml-10 w-full">
+                                <div class="skill-progress-bar" style="width: 80%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7l10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Angular</span>
+                            <div class="skill-progress ml-6 w-full">
+                                <div class="skill-progress-bar" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Vue.js</span>
+                            <div class="skill-progress ml-8 w-full">
+                                <div class="skill-progress-bar" style="width: 70%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Svelte</span>
+                            <div class="skill-progress ml-6 w-full">
+                                <div class="skill-progress-bar" style="width: 60%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Astro</span>
+                            <div class="skill-progress ml-8 w-full">
+                                <div class="skill-progress-bar" style="width: 65%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Next.js</span>
+                            <div class="skill-progress ml-6 w-full">
+                                <div class="skill-progress-bar" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Nuxt</span>
+                            <div class="skill-progress ml-8 w-full">
+                                <div class="skill-progress-bar" style="width: 70%"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="bg-[var(--card-bg)] p-6 rounded-lg shadow-[var(--card-shadow)] text-center">
-                    <h3 class="text-xl font-semibold text-[var(--text-color)] mb-4" data-i18n="skills.tools">ابزارها</h3>
-                    <div class="flex flex-wrap justify-center gap-2">
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Figma</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Photoshop</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Illustrator</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Wazuh</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Rhino</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Tailwind</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Bulma</span>
-                        <span class="skill-item px-3 py-1 bg-[var(--primary-color)] text-white rounded-full">Bootstrap</span>
+                <div class="bg-[var(--card-bg)] p-4 sm:p-6 rounded-lg shadow-[var(--card-shadow)] transform transition-all duration-500 hover:scale-[var(--hover-scale)]">
+                    <h3 class="text-lg sm:text-xl font-semibold text-center mb-4" data-i18n="skills.tools">ابزارها</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Figma</span>
+                            <div class="skill-progress ml-8 w-full">
+                                <div class="skill-progress-bar" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Photoshop</span>
+                            <div class="skill-progress ml-4 w-full">
+                                <div class="skill-progress-bar" style="width: 80%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Illustrator</span>
+                            <div class="skill-progress ml-4 w-full">
+                                <div class="skill-progress-bar" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Wazuh</span>
+                            <div class="skill-progress ml-6 w-full">
+                                <div class="skill-progress-bar" style="width: 70%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Rhino</span>
+                            <div class="skill-progress ml-8 w-full">
+                                <div class="skill-progress-bar" style="width: 65%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Tailwind</span>
+                            <div class="skill-progress ml-6 w-full">
+                                <div class="skill-progress-bar" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Bulma</span>
+                            <div class="skill-progress ml-8 w-full">
+                                <div class="skill-progress-bar" style="width: 80%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                                <path d="M12 2L2 7l10 7 10-7-10-5z" />
+                            </svg>
+                            <span class="text-sm sm:text-base">Bootstrap</span>
+                            <div class="skill-progress ml-4 w-full">
+                                <div class="skill-progress-bar" style="width: 85%"></div>
+                            </div>
+                        </div>
                     </div>
-                    <svg class="w-24 h-24 mx-auto mt-4" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="40" class="skill-circle" />
-                    </svg>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Education Section -->
-    <section id="education" class="py-20 container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center text-[var(--text-color)] mb-10" data-i18n="education.title">تحصیلات</h2>
-        <div class="bg-[var(--card-bg)] p-6 rounded-lg shadow-[var(--card-shadow)]">
-            <h3 class="text-xl font-semibold text-[var(--text-color)]" data-i18n="education.degree">کارشناسی مهندسی کامپیوتر</h3>
-            <p class="text-gray-600 dark:text-gray-300" data-i18n="education.university">دانشگاه فنی و حرفه‌ای</p>
-            <p class="text-gray-600 dark:text-gray-300" data-i18n="education.years">1400-1402 (کاردانی)، 1402-1404 (کارشناسی)</p>
-            <p class="text-gray-600 dark:text-gray-300" data-i18n="education.gpa">معدل: 19</p>
-            <p class="text-gray-600 dark:text-gray-300" data-i18n="education.project">پروژه: پردازش تصویر با پایتون</p>
-            <p class="text-gray-600 dark:text-gray-300" data-i18n="education.achievement">نفر اول دانشگاه</p>
-        </div>
-    </section>
+    <section id="education" class="py-16 sm:py-24 container mx-auto px-4 sm:px-6 md:px-8" role="region" aria-labelledby="education-title">
+        <h2 id="education-title" class="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-10 sm:mb-12" data-i18n="education.title">تحصیلات</h2>
+        <div class="bg-[var(--card-bg)] p-4 sm:p-6 rounded-lg shadow-[var(--card-shadow)] transform transition-all duration-500 hover:scale-[var(--hover-scale)]">
+            <h3 class="text-lg sm:text-xl font-semibold" data-i18n="education.degree">کارشناسی مهندسی کامپیوتر</h3>
+            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-100 mt-2" data-i18n="education.university">دانشگاه فنی و حرفه‌ای</p>
+            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-100 mt-1" data-i18n="education.years">1400-1402 (کاردانی)، 1402-1404 (کارشناسی)</p>
+            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-100 mt-1" data-i18n="education.gpa">معدل: 19</p>
+            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-100 mt-1" data-i18n="education.project">پروژه: پردازش تصویر با پایتون</p>
+            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-100 mt-1" data-i18n="education.achievement">نفر اول دانشگاه</p>
+</div>
+    </div>
+</section>
 
-    <!-- Experience Section -->
-    <section id="experience" class="py-20 bg-[var(--background-color)]">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center text-[var(--text-color)] mb-10" data-i18n="experience.title">سوابق شغلی</h2>
-            <div class="bg-[var(--card-bg)] p-6 rounded-lg shadow-[var(--card-shadow)]">
-                <h3 class="text-xl font-semibold text-[var(--text-color)]" data-i18n="experience.position">برنامه‌نویس و طراح وب</h3>
-                <p class="text-gray-600 dark:text-gray-300" data-i18n="experience.company">شرکت ماهدرایان</p>
-                <p class="text-gray-600 dark:text-gray-300" data-i18n="experience.description">طراحی رابط کاربری، توسعه وب با Angular و WordPress، و ایجاد طرح‌های گرافیکی خلاقانه. همکاری در پروژه‌های متنوع با تمرکز بر تجربه کاربری و عملکرد بالا.</p>
-                <p class="text-gray-600 dark:text-gray-300" data-i18n="experience.duration">5 سال تجربه حرفه‌ای</p>
+<!-- Experience Section -->
+<section id="experience" class="py-16 sm:py-24 bg-[var(--background-color)]" role="region" aria-labelledby="experience-title">
+    <div class="container mx-auto px-4 sm:px-6 md:px-8">
+        <h2 id="experience-title" class="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-10 sm:mb-12" data-i18n="experience.title">سوابق شغلی</h2>
+        <div class="bg-[var(--card-bg)] p-4 sm:p-6 rounded-lg shadow-[var(--card-shadow)] transform transition-all duration-500 hover:scale-[var(--hover-scale)]">
+            <h3 class="text-lg sm:text-xl font-semibold" data-i18n="experience.position">برنامه‌نویس وب و طراح رابط کاربری</h3>
+            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-100 mt-2" data-i18n="experience.company">شرکت ماهدرایان</p>
+            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-100 mt-2" data-i18n="experience.description">طراحی رابط‌های کاربری جذاب، توسعه وب‌سایت‌ها با Angular و WordPress، طراحی گرافیک، و همکاری در پروژه‌های متنوع با تمرکز بر تجربه کاربری و عملکرد بالا. 5 سال تجربه حرفه‌ای در نقش‌های برنامه‌نویس Angular، طراح UI، وردپرس و گرافیک.</p>
+            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-100 mt-2" data-i18n="experience.duration">5 سال (1399-1404)</p>
+        </div>
+    </div>
+</section>
+
+<!-- Projects Section -->
+<section id="projects" class="py-16 sm:py-24 container mx-auto px-4 sm:px-6 md:px-8" role="region" aria-labelledby="projects-title">
+    <h2 id="projects-title" class="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-10 sm:mb-12" data-i18n="projects.title">پروژه‌ها</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
+        <div class="bg-[var(--card-bg)] p-4 sm:p-6 rounded-lg shadow-[var(--card-shadow)] transform transition-all duration-500 hover:scale-[var(--hover-scale)]">
+            <h3 class="text-lg sm:text-xl font-semibold" data-i18n="projects.imageProcessing">پردازش تصویر با پایتون</h3>
+            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-100 mt-2" data-i18n="projects.imageProcessingDesc">توسعه الگوریتم‌های پیشرفته پردازش تصویر برای پروژه‌های دانشگاهی با استفاده از پایتون و کتابخانه‌های OpenCV و NumPy.</p>
+        </div>
+        <div class="bg-[var(--card-bg)] p-4 sm:p-6 rounded-lg shadow-[var(--card-shadow)] transform transition-all duration-500 hover:scale-[var(--hover-scale)]">
+            <h3 class="text-lg sm:text-xl font-semibold" data-i18n="projects.webDesign">طراحی وب‌سایت‌های متنوع</h3>
+            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-100 mt-2" data-i18n="projects.webDesignDesc">طراحی و توسعه وب‌سایت‌های حرفه‌ای با React، Angular و WordPress برای مشتریان مختلف با تمرکز بر UI/UX.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Certificates Section -->
+<section id="certificates" class="py-16 sm:py-24 container mx-auto px-4 sm:px-6 md:px-8" role="region" aria-labelledby="certificates-title">
+    <h2 id="certificates-title" class="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-10 sm:mb-12" data-i18n="certificates.title">گواهینامه‌ها</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
+        <div class="certificate-card relative overflow-hidden rounded-lg shadow-[var(--card-shadow)] transform transition-all duration-500 cursor-pointer" data-modal="certificate-1">
+            <img src="/certificate-1.jpg" alt="Certificate 1" class="w-full h-64 object-cover" loading="lazy">
+            <div class="certificate-overlay absolute inset-0 flex items-center justify-center">
+                <p class="text-white text-base sm:text-lg" data-i18n="certificates.view">مشاهده گواهینامه</p>
             </div>
         </div>
-    </section>
-
-    <!-- Certificates Section -->
-    <section id="certificates" class="py-20 container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center text-[var(--text-color)] mb-10" data-i18n="certificates.title">گواهینامه‌ها</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="certificate-card relative overflow-hidden rounded-lg shadow-[var(--card-shadow)]">
-                <img src="/certificate-1.jpg" alt="Certificate 1" class="w-full h-64 object-cover">
-                <div class="certificate-overlay absolute inset-0 bg-[var(--primary-color)] bg-opacity-50 flex items-center justify-center opacity-0 transition-opacity duration-300">
-                    <p class="text-white text-lg" data-i18n="certificates.view">مشاهده گواهینامه</p>
-                </div>
-            </div>
-            <div class="certificate-card relative overflow-hidden rounded-lg shadow-[var(--card-shadow)]">
-                <img src="/certificate-2.jpg" alt="Certificate 2" class="w-full h-64 object-cover">
-                <div class="certificate-overlay absolute inset-0 bg-[var(--primary-color)] bg-opacity-50 flex items-center justify-center opacity-0 transition-opacity duration-300">
-                    <p class="text-white text-lg" data-i18n="certificates.view">مشاهده گواهینامه</p>
-                </div>
+        <div class="certificate-card relative overflow-hidden rounded-lg shadow-[var(--card-shadow)] transform transition-all duration-500 cursor-pointer" data-modal="certificate-2">
+            <img src="/certificate-2.jpg" alt="Certificate 2" class="w-full h-64 object-cover" loading="lazy">
+            <div class="certificate-overlay absolute inset-0 flex items-center justify-center">
+                <p class="text-white text-base sm:text-lg" data-i18n="certificates.view">مشاهده گواهینامه</p>
             </div>
         </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="py-20 bg-[var(--background-color)]">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center text-[var(--text-color)] mb-10" data-i18n="contact.title">تماس با من</h2>
-            <div class="max-w-lg mx-auto bg-[var(--card-bg)] p-6 rounded-lg shadow-[var(--card-shadow)]">
-                <div class="mb-4">
-                    <label class="block text-[var(--text-color)] mb-2" for="name" data-i18n="contact.name">نام</label>
-                    <input type="text" id="name" class="w-full p-3 rounded-lg border dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" placeholder="نام شما" data-i18n-placeholder="contact.namePlaceholder">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-[var(--text-color)] mb-2" for="email" data-i18n="contact.email">ایمیل</label>
-                    <input type="email" id="email" class="w-full p-3 rounded-lg border dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" placeholder="ایمیل شما" data-i18n-placeholder="contact.emailPlaceholder">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-[var(--text-color)] mb-2" for="message" data-i18n="contact.message">پیام</label>
-                    <textarea id="message" class="w-full p-3 rounded-lg border dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" rows="5" placeholder="پیام شما" data-i18n-placeholder="contact.messagePlaceholder"></textarea>
-                </div>
-                <button type="submit" class="w-full bg-[var(--primary-color)] text-white p-3 rounded-lg hover:bg-blue-700" data-i18n="contact.submit">ارسال</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="py-6 bg-[var(--card-bg)] text-center">
-        <p class="text-gray-600 dark:text-gray-300" data-i18n="footer.copyright">© 2025 محمدامین محمدزاده. تمامی حقوق محفوظ است.</p>
-        <div class="flex justify-center space-x-4 mt-4">
-            <!-- Placeholder for social media icons -->
-            <a href="#" class="text-[var(--text-color)] hover:text-[var(--primary-color)]">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 2a8 8 0 100 16 8 8 0 000-16zm0 12a1 1 0 110-2 1 1 0 010 2zm0-8a1 1 0 110-2 1 1 0 010 2z" />
+    </div>
+    <!-- Modal for Certificates -->
+    <div id="certificate-modal" class="modal">
+        <div class="modal-content">
+            <button id="close-modal" class="absolute top-4 right-4 text-[var(--text-color)] hover:text-[var(--primary-color)]">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
-            </a>
-            <a href="#" class="text-[var(--text-color)] hover:text-[var(--primary-color)]">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 2a8 8 0 100 16 8 8 0 000-16zm0 12a1 1 0 110-2 1 1 0 010 2zm0-8a1 1 0 110-2 1 1 0 010 2z" />
-                </svg>
-            </a>
+            </button>
+            <img id="modal-image" src="" alt="Certificate" class="w-full h-auto">
         </div>
-    </footer>
+    </div>
+</section>
 
-    <script>
-        // Theme Toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        themeToggle.addEventListener('click', () => {
-            document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-            themeToggle.innerHTML = document.documentElement.dataset.theme === 'dark' ?
-                '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 2a8 8 0 100 16 8 8 0 000-16zm0 12a1 1 0 110-2 1 1 0 010 2zm0-8a1 1 0 110-2 1 1 0 010 2z" /></svg>' :
-                '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 2a8 8 0 100 16 8 8 0 000-16zm0 12a1 1 0 110-2 1 1 0 010 2zm0-8a1 1 0 110-2 1 1 0 010 2z" /></svg>';
-        });
+<!-- Management Skills Section -->
+<section id="management" class="py-16 sm:py-24 container mx-auto px-4 sm:px-6 md:px-8" role="region" aria-labelledby="management-title">
+    <h2 id="management-title" class="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-10 sm:mb-12" data-i18n="management.title">مهارت‌های مدیریتی</h2>
+    <div class="bg-[var(--card-bg)] p-4 sm:p-6 rounded-lg shadow-[var(--card-shadow)] transform transition-all duration-500 hover:scale-[var(--hover-scale)]">
+        <div class="space-y-3">
+            <p class="flex items-center text-sm sm:text-base text-gray-600 dark:text-gray-100">
+                <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                    <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+                </svg>
+                <span data-i18n="management.project">مدیریت پروژه</span>
+            </p>
+            <p class="flex items-center text-sm sm:text-base text-gray-600 dark:text-gray-100">
+                <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                    <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+                </svg>
+                <span data-i18n="management.team">مدیریت تیم</span>
+            </p>
+            <p class="flex items-center text-sm sm:text-base text-gray-600 dark:text-gray-100">
+                <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                    <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+                </svg>
+                <span data-i18n="management.teamBuilding">تیم‌سازی</span>
+            </p>
+            <p class="flex items-center text-sm sm:text-base text-gray-600 dark:text-gray-100">
+                <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                    <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+                </svg>
+                <span data-i18n="management.graphicDesign">طراحی گرافیک</span>
+            </p>
+            <p class="flex items-center text-sm sm:text-base text-gray-600 dark:text-gray-100">
+                <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                    <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+                </svg>
+                <span data-i18n="management.security">ساخت ماژول‌های امنیتی</span>
+            </p>
+            <p class="flex items-center text-sm sm:text-base text-gray-600 dark:text-gray-100">
+                <svg class="w-6 h-6 mr-2 icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)">
+                    <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+                </svg>
+                <span data-i18n="management.ai">ساخت مدل‌های هوش مصنوعی</span>
+            </p>
+        </div>
+    </div>
+</section>
 
-        // Language Toggle
-        const translations = {
-            fa: {
-                'nav.about': 'درباره من',
-                'nav.skills': 'مهارت‌ها',
-                'nav.education': 'تحصیلات',
-                'nav.experience': 'سوابق شغلی',
-                'nav.certificates': 'گواهینامه‌ها',
-                'nav.contact': 'تماس با من',
-                'hero.name': 'محمدامین محمدزاده',
-                'hero.tagline': 'برنامه‌نویس فرانت‌اند و طراح وب خلاق',
-                'hero.location': 'همدان، ایران',
-                'hero.download': 'دانلود رزومه',
-                'skills.title': 'مهارت‌ها',
-                'skills.programming': 'زبان‌های برنامه‌نویسی',
-                'skills.frameworks': 'فریم‌ورک‌ها',
-                'skills.tools': 'ابزارها',
-                'education.title': 'تحصیلات',
-                'education.degree': 'کارشناسی مهندسی کامپیوتر',
-                'education.university': 'دانشگاه فنی و حرفه‌ای',
-                'education.years': '1400-1402 (کاردانی)، 1402-1404 (کارشناسی)',
-                'education.gpa': 'معدل: 19',
-                'education.project': 'پروژه: پردازش تصویر با پایتون',
-                'education.achievement': 'نفر اول دانشگاه',
-                'experience.title': 'سوابق شغلی',
-                'experience.position': 'برنامه‌نویس و طراح وب',
-                'experience.company': 'شرکت ماهدرایان',
-                'experience.description': 'طراحی رابط کاربری، توسعه وب با Angular و WordPress، و ایجاد طرح‌های گرافیکی خلاقانه. همکاری در پروژه‌های متنوع با تمرکز بر تجربه کاربری و عملکرد بالا.',
-                'experience.duration': '5 سال تجربه حرفه‌ای',
-                'certificates.title': 'گواهینامه‌ها',
-                'certificates.view': 'مشاهده گواهینامه',
-                'contact.title': 'تماس با من',
-                'contact.name': 'نام',
-                'contact.namePlaceholder': 'نام شما',
-                'contact.email': 'ایمیل',
-                'contact.emailPlaceholder': 'ایمیل شما',
-                'contact.message': 'پیام',
-                'contact.messagePlaceholder': 'پیام شما',
-                'contact.submit': 'ارسال',
-                'footer.copyright': '© 2025 محمدامین محمدزاده. تمامی حقوق محفوظ است.'
-            },
-            en: {
-                'nav.about': 'About Me',
-                'nav.skills': 'Skills',
-                'nav.education': 'Education',
-                'nav.experience': 'Experience',
-                'nav.certificates': 'Certificates',
-                'nav.contact': 'Contact Me',
-                'hero.name': 'Mohammadamin Mohammadzadeh',
-                'hero.tagline': 'Creative Front-End Developer & Web Designer',
-                'hero.location': 'Hamedan, Iran',
-                'hero.download': 'Download Resume',
-                'skills.title': 'Skills',
-                'skills.programming': 'Programming Languages',
-                'skills.frameworks': 'Frameworks',
-                'skills.tools': 'Tools',
-                'education.title': 'Education',
-                'education.degree': 'Bachelor of Computer Engineering',
-                'education.university': 'Technical and Vocational University',
-                'education.years': '2021-2023 (Associate), 2023-2025 (Bachelor)',
-                'education.gpa': 'GPA: 19',
-                'education.project': 'Project: Image Processing with Python',
-                'education.achievement': 'Top Student of the University',
-                'experience.title': 'Experience',
-                'experience.position': 'Web Developer & Designer',
-                'experience.company': 'Mahdrayan Company',
-                'experience.description': 'Designed user interfaces, developed web applications with Angular and WordPress, and created creative graphic designs. Collaborated on various projects focusing on user experience and high performance.',
-                'experience.duration': '5 Years of Professional Experience',
-                'certificates.title': 'Certificates',
-                'certificates.view': 'View Certificate',
-                'contact.title': 'Contact Me',
-                'contact.name': 'Name',
-                'contact.namePlaceholder': 'Your Name',
-                'contact.email': 'Email',
-                'contact.emailPlaceholder': 'Your Email',
-                'contact.message': 'Message',
-                'contact.messagePlaceholder': 'Your Message',
-                'contact.submit': 'Submit',
-                'footer.copyright': '© 2025 Mohammadamin Mohammadzadeh. All rights reserved.'
-            }
-        };
+<!-- Contact Section -->
+<section id="contact" class="py-16 sm:py-24 bg-[var(--background-color)] relative" role="region" aria-labelledby="contact-title">
+    <div class="container mx-auto px-4 sm:px-6 md:px-8">
+        <h2 id="contact-title" class="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-10 sm:mb-12" data-i18n="contact.title">تماس با من</h2>
+        <div class="max-w-lg mx-auto bg-[var(--card-bg)] p-4 sm:p-6 rounded-lg shadow-[var(--card-shadow)]">
+            <div class="mb-3 sm:mb-4">
+                <label class="block text-sm sm:text-base text-gray-600 dark:text-gray-100 mb-1" for="name" data-i18n="contact.name">نام</label>
+                <input type="text" id="name" class="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg border dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 input-focus text-sm sm:text-base" placeholder="نام شما" data-i18n-placeholder="contact.namePlaceholder" aria-required="true">
+            </div>
+            <div class="mb-3 sm:mb-4">
+                <label class="block text-sm sm:text-base text-gray-600 dark:text-gray-100 mb-1" for="email" data-i18n="contact.email">ایمیل</label>
+                <input type="email" id="email" class="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg border dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 input-focus text-sm sm:text-base" placeholder="ایمیل شما" data-i18n-placeholder="contact.emailPlaceholder" aria-required="true">
+            </div>
+            <div class="mb-3 sm:mb-4">
+                <label class="block text-sm sm:text-base text-gray-600 dark:text-gray-100 mb-1" for="message" data-i18n="contact.message">پیام</label>
+                <textarea id="message" class="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg border dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 input-focus text-sm sm:text-base" rows="5" placeholder="پیام شما" data-i18n-placeholder="contact.messagePlaceholder" aria-required="true"></textarea>
+            </div>
+            <button type="submit" class="w-full bg-[var(--primary-color)] text-white py-2 sm:py-3 rounded-lg hover:bg-[var(--secondary-color)] transition-all duration-300 transform hover:scale-[var(--hover-scale)] text-sm sm:text-base" data-i18n="contact.submit">ارسال</button>
+        </div>
+    </div>
+    <svg class="absolute inset-0 w-full h-16 bottom-0 opacity-20 z-0" viewBox="0 0 200 50" fill="none" stroke="var(--primary-color)">
+        <path d="M0 25h50c25 0 25 25 50 25s25-25 50 25h50" />
+    </svg>
+</section>
 
-        const langToggle = document.getElementById('lang-toggle');
-        let currentLang = 'fa';
-        langToggle.addEventListener('click', () => {
-            currentLang = currentLang === 'fa' ? 'en' : 'fa';
-            document.documentElement.dir = currentLang === 'fa' ? 'rtl' : 'ltr';
-            document.documentElement.lang = currentLang;
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                el.textContent = translations[currentLang][el.dataset.i18n];
-            });
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-                el.placeholder = translations[currentLang][el.dataset.i18nPlaceholder];
-            });
-        });
+<!-- Footer -->
+<footer class="py-6 sm:py-8 bg-[var(--card-bg)] text-center" role="contentinfo">
+    <p class="text-sm sm:text-base text-gray-600 dark:text-gray-100" data-i18n="footer.copyright">© 1404 محمدامین محمدزاده. تمامی حقوق محفوظ است.</p>
+    <div class="flex justify-center space-x-4 sm:space-x-6 mt-4">
+        <a href="#" class="text-[var(--text-color)] hover:text-[var(--primary-color)] transition-all duration-300 icon-svg" aria-label="LinkedIn Profile">
+            <svg class="w-6 sm:w-7 h-6 sm:h-7" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h14zm-8.66 6.55h-2.2v7.28h2.2V9.55zm.33-1.74a1.28 1.28 0 100-2.56 1.28 1.28 0 000 2.56zm7.25 1.74h-2.2v3.88c0-.93-.33-1.56-1.16-1.56-.63 0-1 .42-1.17.82v4.14h-2.2V9.55h2.1v.95c.3-.46.83-.95 1.76-.95 1.29 0 2.26.98 2.26 3.08v4.15h.61z" />
+            </svg>
+        </a>
+        <a href="#" class="text-[var(--text-color)] hover:text-[var(--primary-color)] transition-all duration-300 icon-svg" aria-label="GitHub Profile">
+            <svg class="w-6 sm:w-7 h-6 sm:h-7" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2A10 10 0 002 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.12-1.47-1.12-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.5 2.28 1.07 2.84.81.09-.64.35-1.07.63-1.32-2.2-.25-4.51-1.1-4.51-4.9 0-1.08.39-1.96 1.03-2.65-.1-.25-.45-1.26.1-2.63 0 0 .84-.27 2.75 1.02A9.58 9.58 0 0112 6.8c.85 0 1.71.11 2.52.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.38.1 2.63.64.69 1.03 1.57 1.03 2.65 0 3.81-2.32 4.65-4.53 4.9.36.31.67.94.67 1.89v2.8c0 .28.16.59.67.5A10 10 0 0022 12A10 10 0 0012 2z" />
+            </svg>
+        </a>
+    </div>
+</footer>
 
-        // GSAP Animations
-        gsap.registerPlugin(ScrollTrigger);
-        gsap.from('#about > div', { opacity: 0, y: 50, duration: 1, ease: 'power3.out' });
-        gsap.from('#skills .skill-item', {
-            scrollTrigger: { trigger: '#skills', start: 'top 80%' },
-            opacity: 0, scale: 0.8, stagger: 0.1, duration: 0.5
-        });
-        gsap.from('#education > div', {
-            scrollTrigger: { trigger: '#education', start: 'top 80%' },
-            opacity: 0, y: 50, duration: 1
-        });
-        gsap.from('#experience > div', {
-            scrollTrigger: { trigger: '#experience', start: 'top 80%' },
-            opacity: 0, y: 50, duration: 1
-        });
-        gsap.from('#certificates .certificate-card', {
-            scrollTrigger: { trigger: '#certificates', start: 'top 80%' },
-            opacity: 0, scale: 0.8, stagger: 0.2, duration: 0.8
-        });
-        gsap.from('#contact > div', {
-            scrollTrigger: { trigger: '#contact', start: 'top 80%' },
-            opacity: 0, y: 50, duration: 1
-        });
+<script>
+// Particle Effects
+const particleCanvas = document.getElementById('particle-canvas');
+const ctx = particleCanvas.getContext('2d');
+particleCanvas.width = window.innerWidth;
+particleCanvas.height = document.querySelector('#about').offsetHeight;
 
-        // Anime.js for Skill Circle Animation
-        anime({
-            targets: '.skill-circle',
-            strokeDashoffset: [anime.setDashoffset, 0],
-            easing: 'easeInOutSine',
-            duration: 1500,
-            delay: (el, i) => i * 250,
-            direction: 'alternate',
-            loop: true
-        });
-    </script>
+const particlesArray = [];
+const numberOfParticles = 50;
+
+class Particle {
+    constructor() {
+        this.x = Math.random() * particleCanvas.width;
+        this.y = Math.random() * particleCanvas.height;
+        this.size = Math.random() * 5 + 1;
+        this.speedX = Math.random() * 1 - 0.5;
+        this.speedY = Math.random() * 1 - 0.5;
+    }
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.size > 0.2) this.size -= 0.1;
+        if (this.x < 0 || this.x > particleCanvas.width) this.speedX *= -1;
+        if (this.y < 0 || this.y > particleCanvas.height) this.speedY *= -1;
+    }
+    draw() {
+        ctx.fillStyle = 'rgba(59, 130, 246, 0.5)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+function initParticles() {
+    for (let i = 0; i < numberOfParticles; i++) {
+        particlesArray.push(new Particle());
+    }
+}
+
+function animateParticles() {
+    ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+    for (let i = 0; i < particlesArray.length; i++) {
+        particlesArray[i].update();
+        particlesArray[i].draw();
+        if (particlesArray[i].size <= 0.2) {
+            particlesArray.splice(i, 1);
+            i--;
+            particlesArray.push(new Particle());
+        }
+    }
+    requestAnimationFrame(animateParticles);
+}
+
+initParticles();
+animateParticles();
+
+// Loader Animation
+window.addEventListener('load', () => {
+    anime({
+        targets: '#loader-path',
+        strokeDashoffset: [anime.setDashoffset, 0],
+        easing: 'easeInOutSine',
+        duration: 1500,
+        loop: true
+    });
+    setTimeout(() => {
+        document.getElementById('loader').classList.add('hidden');
+    }, 2000);
+});
+
+// Theme Toggle
+const themeToggle = document.getElementById('theme-toggle');
+themeToggle.addEventListener('click', () => {
+    document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    themeToggle.innerHTML = document.documentElement.dataset.theme === 'dark' ?
+        '<svg class="w-6 h-6 icon-svg" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 2a8 8 0 100 16 8 8 0 000-16zm0 12a1 1 0 110-2 1 1 0 010 2zm0-8a1 1 0 110-2 1 1 0 010 2z" /></svg>' :
+        '<svg class="w-6 h-6 icon-svg" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2c.36 0 .71.02 1.06.07a8 8 0 00-7.94 13.86A10 10 0 1122 12a9.94 9.94 0 01-10-10z" /></svg>';
+});
+
+// Language Toggle
+const translations = {
+    fa: {
+        'nav.about': 'درباره من',
+        'nav.skills': 'مهارت‌ها',
+        'nav.education': 'تحصیلات',
+        'nav.experience': 'سوابق شغلی',
+        'nav.projects': 'پروژه‌ها',
+        'nav.certificates': 'گواهینامه‌ها',
+        'nav.management': 'مهارت‌های مدیریتی',
+        'nav.contact': 'تماس با من',
+        'hero.name': 'محمدامین محمدزاده',
+        'hero.tagline': 'برنامه‌نویس فرانت‌اند، طراح وب و متخصص پردازش تصویر',
+        'hero.location': 'همدان، ایران',
+        'hero.email': 'm.amin.mdzh@gmail.com',
+        'hero.download': 'دانلود رزومه',
+        'skills.title': 'مهارت‌ها',
+        'skills.programming': 'زبان‌های برنامه‌نویسی',
+        'skills.frameworks': 'فریم‌ورک‌ها',
+        'skills.tools': 'ابزارها',
+        'education.title': 'تحصیلات',
+        'education.degree': 'کارشناسی مهندسی کامپیوتر',
+        'education.university': 'دانشگاه فنی و حرفه‌ای',
+        'education.years': '1400-1402 (کاردانی)، 1402-1404 (کارشناسی)',
+        'education.gpa': 'معدل: 19',
+        'education.project': 'پروژه: پردازش تصویر با پایتون',
+        'education.achievement': 'نفر اول دانشگاه',
+        'experience.title': 'سوابق شغلی',
+        'experience.position': 'برنامه‌نویس وب و طراح رابط کاربری',
+        'experience.company': 'شرکت ماهدرایان',
+        'experience.description': 'طراحی رابط‌های کاربری جذاب، توسعه وب‌سایت‌ها با Angular و WordPress، طراحی گرافیک، و همکاری در پروژه‌های متنوع با تمرکز بر تجربه کاربری و عملکرد بالا. 5 سال تجربه حرفه‌ای در نقش‌های برنامه‌نویس Angular، طراح UI، وردپرس و گرافیک.',
+        'experience.duration': '5 سال (1399-1404)',
+        'projects.title': 'پروژه‌ها',
+        'projects.imageProcessing': 'پردازش تصویر با پایتون',
+        'projects.imageProcessingDesc': 'توسعه الگوریتم‌های پیشرفته پردازش تصویر برای پروژه‌های دانشگاهی با استفاده از پایتون و کتابخانه‌های OpenCV و NumPy.',
+        'projects.webDesign': 'طراحی وب‌سایت‌های متنوع',
+        'projects.webDesignDesc': 'طراحی و توسعه وب‌سایت‌های حرفه‌ای با React، Angular و WordPress برای مشتریان مختلف با تمرکز بر UI/UX.',
+        'certificates.title': 'گواهینامه‌ها',
+        'certificates.view': 'مشاهده گواهینامه',
+        'management.title': 'مهارت‌های مدیریتی',
+        'management.project': 'مدیریت پروژه',
+        'management.team': 'مدیریت تیم',
+        'management.teamBuilding': 'تیم‌سازی',
+        'management.graphicDesign': 'طراحی گرافیک',
+        'management.security': 'ساخت ماژول‌های امنیتی',
+        'management.ai': 'ساخت مدل‌های هوش مصنوعی',
+        'contact.title': 'تماس با من',
+        'contact.name': 'نام',
+        'contact.namePlaceholder': 'نام شما',
+        'contact.email': 'ایمیل',
+        'contact.emailPlaceholder': 'ایمیل شما',
+        'contact.message': 'پیام',
+        'contact.messagePlaceholder': 'پیام شما',
+        'contact.submit': 'ارسال',
+        'footer.copyright': '© 1404 محمدامین محمدزاده. تمامی حقوق محفوظ است.'
+    },
+    en: {
+        'nav.about': 'About Me',
+        'nav.skills': 'Skills',
+        'nav.education': 'Education',
+        'nav.experience': 'Experience',
+        'nav.projects': 'Projects',
+        'nav.certificates': 'Certificates',
+        'nav.management': 'Management Skills',
+        'nav.contact': 'Contact Me',
+        'hero.name': 'Mohammadamin Mohammadzadeh',
+        'hero.tagline': 'Front-End Developer, Web Designer, and Image Processing Specialist',
+        'hero.location': 'Hamedan, Iran',
+        'hero.email': 'm.amin.mdzh@gmail.com',
+        'hero.download': 'Download Resume',
+        'skills.title': 'Skills',
+        'skills.programming': 'Programming Languages',
+        'skills.frameworks': 'Frameworks',
+        'skills.tools': 'Tools',
+        'education.title': 'Education',
+        'education.degree': 'Bachelor of Computer Engineering',
+        'education.university': 'Technical and Vocational University',
+        'education.years': '2021-2023 (Associate), 2023-2025 (Bachelor)',
+        'education.gpa': 'GPA: 19',
+        'education.project': 'Project: Image Processing with Python',
+        'education.achievement': 'Top Student of the University',
+        'experience.title': 'Experience',
+        'experience.position': 'Web Developer and UI Designer',
+        'experience.company': 'Mahdrayan Company',
+        'experience.description': 'Designed engaging user interfaces, developed websites with Angular and WordPress, and created graphic designs. Collaborated on diverse projects focusing on user experience and high performance. 5 years of professional experience in Angular development, UI design, WordPress, and graphic design.',
+        'experience.duration': '5 Years (2020-2025)',
+        'projects.title': 'Projects',
+        'projects.imageProcessing': 'Image Processing with Python',
+        'projects.imageProcessingDesc': 'Developed advanced image processing algorithms for academic projects using Python and libraries like OpenCV and NumPy.',
+        'projects.webDesign': 'Web Design for Various Clients',
+        'projects.webDesignDesc': 'Designed and developed professional websites with React, Angular, and WordPress for various clients, focusing on UI/UX.',
+        'certificates.title': 'Certificates',
+        'certificates.view': 'View Certificate',
+        'management.title': 'Management Skills',
+        'management.project': 'Project Management',
+        'management.team': 'Team Management',
+        'management.teamBuilding': 'Team Building',
+        'management.graphicDesign': 'Graphic Design',
+        'management.security': 'Building Security Modules',
+        'management.ai': 'Building AI Models',
+        'contact.title': 'Contact Me',
+        'contact.name': 'Name',
+        'contact.namePlaceholder': 'Your Name',
+        'contact.email': 'Email',
+        'contact.emailPlaceholder': 'Your Email',
+        'contact.message': 'Message',
+        'contact.messagePlaceholder': 'Your Message',
+        'contact.submit': 'Submit',
+        'footer.copyright': '© 2025 Mohammadamin Mohammadzadeh. All rights reserved.'
+    }
+};
+
+const langToggle = document.getElementById('lang-toggle');
+let currentLang = 'fa';
+langToggle.addEventListener('click', () => {
+    currentLang = currentLang === 'fa' ? 'en' : 'fa';
+    document.documentElement.dir = currentLang === 'fa' ? 'rtl' : 'ltr';
+    document.documentElement.lang = currentLang;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.textContent = translations[currentLang][el.dataset.i18n];
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        el.placeholder = translations[currentLang][el.dataset.i18nPlaceholder];
+    });
+    anime({
+        targets: '.type-animation',
+        textContent: translations[currentLang]['hero.tagline'],
+        duration: 2000,
+        easing: 'easeInOutQuad'
+    });
+});
+
+// Modal for Certificates
+const certificateCards = document.querySelectorAll('.certificate-card');
+const modal = document.getElementById('certificate-modal');
+const modalImage = document.getElementById('modal-image');
+const closeModal = document.getElementById('close-modal');
+
+certificateCards.forEach(card => {
+    card.addEventListener('click', () => {
+        modalImage.src = card.querySelector('img').src;
+        modal.style.display = 'flex';
+        gsap.from('.modal-content', { scale: 0.5, opacity: 0, duration: 0.5, ease: 'back.out(1.7)' });
+    });
+});
+
+closeModal.addEventListener('click', () => {
+    gsap.to('.modal-content', {
+        scale: 0.5,
+        opacity: 0,
+        duration: 0.5,
+        ease: 'back.in(1.7)',
+        onComplete: () => {
+            modal.style.display = 'none';
+        }
+    });
+});
+
+// GSAP Animations
+gsap.registerPlugin(ScrollTrigger);
+gsap.from('#about > div', {
+    opacity: 0,
+    y: 150,
+    duration: 1.5,
+    ease: 'power4.out'
+});
+gsap.from('#skills .skill-progress-bar', {
+    scrollTrigger: { trigger: '#skills', start: 'top 80%' },
+    width: 0,
+    duration: 1.5,
+    stagger: 0.2,
+    ease: 'power2.out'
+});
+gsap.from('#education > div', {
+    scrollTrigger: { trigger: '#education', start: 'top 80%' },
+    opacity: 0,
+    y: 150,
+    duration: 1.5,
+    ease: 'power4.out'
+});
+gsap.from('#experience > div', {
+    scrollTrigger: { trigger: '#experience', start: 'top 80%' },
+    opacity: 0,
+    y: 150,
+    duration: 1.5,
+    ease: 'power4.out',
+    scrollTrigger: { trigger: '#experience', start: 'top 80%' }
+});
+gsap.from('#projects > div', {
+    scrollTrigger: { trigger: '#projects', start: 'top 80%' },
+    opacity: 0,
+    y: 100,
+    duration: 1.5,
+    stagger: 0.3,
+    ease: 'power4.out'
+});
+gsap.from('#certificates .certificate-card', {
+    scrollTrigger: { trigger: '#certificates', start: 'top 80%' },
+    opacity: 0,
+    rotateY: 360,
+    scale: 0.7,
+    duration: 1.2,
+    stagger: 0.4,
+    ease: 'back.out(1.7)'
+});
+gsap.from('#management > div', {
+    scrollTrigger: { trigger: '#management', start: 'top 80%' },
+    opacity: 0,
+    y: 150,
+    duration: 1.5,
+    ease: 'power4.out'
+});
+gsap.from('#contact > div', {
+    scrollTrigger: { trigger: '#contact', start: 'top 80%' },
+    opacity: 0,
+    y: 150,
+    duration: 1.5,
+    ease: 'power4.out'
+});
+gsap.from('#contact .input-focus', {
+    scrollTrigger: { trigger: '#contact', start: 'top 80%' },
+    opacity: 0,
+    y: 30,
+    stagger: 0.3,
+    duration: 0.8,
+    ease: 'power2.out'
+});
+gsap.from('footer a', {
+    scrollTrigger: { trigger: 'footer', start: 'top 80%' },
+    opacity: 0,
+    y: 50,
+    stagger: 0.2,
+    duration: 1,
+    ease: 'power2.out'
+});
+
+// Anime.js Animations
+anime({
+    targets: '#loader-path',
+    strokeDashoffset: [anime.setDashoffset, 0],
+    easing: 'easeInOutSine',
+    duration: 1500,
+    loop: true
+});
+
+anime({
+    targets: '#logo path',
+    d: [
+        { value: 'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' },
+        { value: 'M12 2L4 8l8 8 8-8L12 2zM4 14l8 8 8-8M4 10l8 8 8-8' }
+    ],
+    easing: 'easeInOutQuad',
+    duration: 4000,
+    loop: true
+});
+
+anime({
+    targets: '.type-animation',
+    textContent: translations[currentLang]['hero.tagline'],
+    duration: 2500,
+    easing: 'easeInOutQuad'
+});
+</script>
 </body>
 </html>
